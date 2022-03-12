@@ -1,0 +1,30 @@
+anyio==3.5.0; python_version >= "3.6" and python_full_version >= "3.6.2"
+asgiref==3.5.0; python_version >= "3.7"
+click==8.0.3; python_version >= "3.7"
+colorama==0.4.4; python_version >= "3.7" and python_full_version < "3.0.0" and sys_platform == "win32" and platform_system == "Windows" or sys_platform == "win32" and python_version >= "3.7" and python_full_version >= "3.5.0" and platform_system == "Windows"
+colour==0.1.5
+enum-compat==0.0.3
+fastapi==0.73.0; python_full_version >= "3.6.1"
+govee-btled @ git+https://github.com/Freemanium/govee_btled@master
+h11==0.13.0; python_version >= "3.7"
+httptools==0.4.0; python_version >= "3.7" and python_full_version >= "3.5.0"
+idna==3.3; python_version >= "3.6" and python_full_version >= "3.6.2"
+importlib-metadata==4.11.0; python_version < "3.8" and python_version >= "3.7"
+loguru==0.6.0; python_version >= "3.5"
+pexpect==4.8.0
+ptyprocess==0.7.0
+pydantic==1.9.0; python_full_version >= "3.6.1"
+pygatt==4.0.5
+pyserial==3.5
+python-dotenv==0.19.2; python_version >= "3.7"
+pyyaml==6.0; python_version >= "3.7"
+simplepyble @ git+https://github.com/OpenBluetoothToolbox/python_simpleble.git@main ; python_version >= "3.6"
+sniffio==1.2.0; python_version >= "3.6" and python_full_version >= "3.6.2"
+starlette==0.17.1; python_version >= "3.6" and python_full_version >= "3.6.1"
+typing-extensions==4.0.1; python_version < "3.8" and python_version >= "3.7" and python_full_version >= "3.6.2"
+uvicorn==0.17.6; python_version >= "3.7"
+uvloop==0.16.0; sys_platform != "win32" and sys_platform != "cygwin" and platform_python_implementation != "PyPy" and python_version >= "3.7"
+watchgod==0.7; python_version >= "3.7"
+websockets==10.1; python_version >= "3.7"
+win32-setctime==1.1.0; sys_platform == "win32" and python_version >= "3.5"
+zipp==3.7.0; python_version < "3.8" and python_version >= "3.7"

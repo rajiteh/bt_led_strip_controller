@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "led-hack"
+version = "0.1.0"
+description = ""
+authors = ["Your Name <you@example.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.7"
+simplepyble = { git = "https://github.com/OpenBluetoothToolbox/python_simpleble.git", branch = "main" }
+loguru = "^0.6.0"
+fastapi = "^0.73.0"
+uvicorn = {extras = ["standard"], version = "^0.17.4"}
+govee-btled = {git = "https://github.com/Freemanium/govee_btled"}
+colour = "^0.1.5"
+
+[tool.poetry.dev-dependencies]
+pytest = "^5.2"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

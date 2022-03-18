@@ -4,73 +4,42 @@ from typing import List
 from loguru import logger
 import sys
 import simplepyble
+
+import pygatt
 from colour import Color
 
-class MirrorStrip:
+class MirrorLEDStrip:
     
-    SERVICE_UUID = "0000fff0-0000-1000-8000-00805f9b34fb"
     CHARACTER_UUID = "0000fff3-0000-1000-8000-00805f9b34fb"
     
-    ADAPTER_IDENTIFIER = "hci0"
+    def __init__(self, mac, backend_cls=pygatt.GATTToolBackend):
+        self._bt = backend_cls()
+        self._bt.start()
+        self.mac = mac
+        try:
+            self._dev = self._bt.connect(self.mac)
+            self._connected = True
+        except pygatt.exceptions.NotConnectedError as err:
+            self._cleanup()
+            raise ConnectionTimeout(self.mac, err)
 
-    def __init__(self, strip):
+    def _cleanup(self):
+        logger.info("Cleanup")
         self._connected = False
-        self.strip = strip
-        self.connect()
+        try:
+            if hasattr(self, '_dev') and self._dev:
+                self._dev.disconnect()
+                self._dev = None
+            if hasattr(self, '_bt') and self._bt:
+                self._bt.stop()
+                self._bt = None
+        except pygatt.exceptions.NotConnectedError as err:
+            pass
 
     def __del__(self):
-        logger.info("Disconnecting")
-        self.disconnect()
-
-    def connect(self, force=False):
-        if self._connected and not force:
-            return
-
-        logger.info("Connecting")
-        self.strip.connect()
-        self._connected = True
-
-    def disconnect(self):
-        self.strip.disconnect()
-        self._connected = False
-        
-    @contextmanager
-    def connected(self):
-        self.connect()
-        try:
-            yield self
-        finally:
-            self.disconnect()
+        self._cleanup()
 
     
-    @classmethod
-    def discover_device_by_mac(klass, mac : str) -> "MirrorStrip":
-        adapters = simplepyble.Adapter.get_adapters()
-
-        if len(adapters) == 0:
-            logger.error("No adapters found")
-            sys.exit(1)
-
-        adapter = [adapter for adapter in adapters if adapter.identifier() == klass.ADAPTER_IDENTIFIER].pop()
-        logger.debug(f"Selected adapter: {adapter.identifier()} [{adapter.address()}]")
-        peripheral=None
-        attempts=0
-        while True:
-            try:
-                scan_period =125 + (attempts * 50)
-                logger.debug(f"Scanning devices for {scan_period}")
-                adapter.scan_for(scan_period)
-                peripherals = adapter.scan_get_results()
-                peripheral = [p for p in peripherals if p.address() == mac].pop()
-                break
-            except Exception as e:
-                attempts = attempts + 1
-                if attempts > 4:
-                    raise e
-                logger.error(f"Discovery failure: {str(e)}")
-
-        logger.debug(f"Selected peripheral: {peripheral.identifier()} [{peripheral.address()}]")
-        return klass(peripheral)
     def _write_bytes(self, content: List['int']):
         if not self._connected:
             raise Exception("Not connected.")
@@ -79,7 +48,8 @@ class MirrorStrip:
             raise Exception(f"Incorrect content data. Recieved: {str(content)}")
         content_bytes = b''.join([i.to_bytes(1, byteorder="big", signed=True) for i in content])
         logger.debug(f"Writing: {str(content)} ({str(content_bytes)}))")
-        self.strip.write_request(self.SERVICE_UUID, self.CHARACTER_UUID, content_bytes)
+        self._dev.char_write(self.CHARACTER_UUID, content_bytes)
+        # self.strip.write_request(self.SERVICE_UUID, self.CHARACTER_UUID, content_bytes)
 
     def _clamped(self, number, min=-126, max=126):
         if number > max:

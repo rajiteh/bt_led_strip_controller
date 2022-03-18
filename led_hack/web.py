@@ -5,7 +5,7 @@ from loguru import logger
 from fastapi import FastAPI, Request
 from fastapi.responses import RedirectResponse, JSONResponse
 
-from .strips import mirror, govee
+from .strips import mirror, govee, connect_strip
 
 from .api.mirror import router as mirror_router
 from .api.govee import router as govee_router
@@ -26,24 +26,6 @@ logger.add(
     format=f"{LOG_PREFIX} | {{message}} ",
     level="DEBUG",
 )
-
-
-@app.middleware("http")
-async def govee_state(request: Request, call_next):
-    if "/govee" in request.url.path:
-        request.state.govee_led = govee.connect_govee("A4:C1:38:96:18:60")
-    
-    response = await call_next(request)
-    return response
-
-@app.middleware("http")
-async def mirror_state(request: Request, call_next):
-    if "/mirror" in request.url.path:
-        request.state.mirror_led = mirror.MirrorStrip.discover_device_by_mac("FF:FF:18:07:F5:0B")
-        with request.state.mirror_led.connected():
-            return await call_next(request)
-    else:
-        return await call_next(request)
 
 @app.middleware("http")
 async def log_requests(request: Request, call_next):
@@ -71,6 +53,17 @@ async def log_requests(request: Request, call_next):
             logger.info(
                 f"client={request.client.host}:{request.client.port} method={request.method} url={request.url.path} response={log_resp['response']} completed_in={formatted_process_time}ms ",
             )
+    return response
+
+
+@app.middleware("http")
+async def initialize_bt(request: Request, call_next):
+    if "/govee" in request.url.path:
+        request.state.govee_led = connect_strip("govee", "A4:C1:38:96:18:60", govee.BluetoothLED)
+    elif "/mirror" in request.url.path:
+        request.state.mirror_led = connect_strip("mirror", "FF:FF:18:07:F5:0B", mirror.MirrorLEDStrip)
+
+    response = await call_next(request)
     return response
 
 @app.get("/")

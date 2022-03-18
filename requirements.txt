@@ -18,7 +18,6 @@ pygatt==4.0.5
 pyserial==3.5
 python-dotenv==0.19.2; python_version >= "3.7"
 pyyaml==6.0; python_version >= "3.7"
-simplepyble @ git+https://github.com/OpenBluetoothToolbox/python_simpleble.git@main ; python_version >= "3.6"
 sniffio==1.2.0; python_version >= "3.6" and python_full_version >= "3.6.2"
 starlette==0.17.1; python_version >= "3.6" and python_full_version >= "3.6.1"
 typing-extensions==4.0.1; python_version < "3.8" and python_version >= "3.7" and python_full_version >= "3.6.2"

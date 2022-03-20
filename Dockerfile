@@ -1,9 +1,11 @@
 FROM python:3.7-buster
 ENV PYTHONIOENCODING=UTF-8
 ENV PYTHONUNBUFFERED=1
-RUN apt-get update && apt-get install -y build-essential libdbus-glib-1-dev libgirepository1.0-dev
+# RUN apt-get update && apt-get install -y build-essential libdbus-glib-1-dev libgirepository1.0-dev
 WORKDIR /app
 ADD requirements.txt .
-RUN pip3 install --user -r requirements.txt
+RUN pip3 install -r requirements.txt
+RUN apt-get update && apt-get install -qy sudo bluez
+RUN printf '#!/bin/sh\ntrue\n' > /usr/local/bin/systemctl && chmod +x /usr/local/bin/systemctl
 ADD . .
-CMD [ "uvicorn", "led_hack.web:app", "--host", "0.0.0.0" ]
+CMD ["./entrypoint.sh"]

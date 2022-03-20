@@ -2,8 +2,7 @@
 from contextlib import contextmanager
 from typing import List
 from loguru import logger
-import sys
-import simplepyble
+
 
 import pygatt
 from colour import Color
@@ -21,7 +20,7 @@ class MirrorLEDStrip:
             self._connected = True
         except pygatt.exceptions.NotConnectedError as err:
             self._cleanup()
-            raise ConnectionTimeout(self.mac, err)
+            raise err
 
     def _cleanup(self):
         logger.info("Cleanup")

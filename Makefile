@@ -1,7 +1,9 @@
 IMAGE ?= led-hack:latest
 
-build:
+requirements:
 	poetry export --format=requirements.txt --without-hashes --output=requirements.txt
+	
+build:
 	docker build -t ${IMAGE} .
 
 run:
